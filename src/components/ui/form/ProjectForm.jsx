@@ -42,7 +42,12 @@ const ProjectForm = ({ type = "add" }) => {
     handleAddDoc("projects", value);
   };
   const handleUpdateProject = (value) => {
-    handleUpdateDoc(value);
+    const updateData = {
+      path: "projects",
+      id,
+      data: value,
+    };
+    handleUpdateDoc(updateData);
   };
 
   useEffect(() => {

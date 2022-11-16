@@ -1,10 +1,10 @@
 import React from "react";
 import Label from "./Label";
 
-const InputFile = ({ name, ...props }) => {
+const InputFile = ({ name, hiddenLabel = false, ...props }) => {
   return (
     <div>
-      <Label display="Chọn hình ảnh" htmlFor={name} />
+      {!hiddenLabel && <Label display="Chọn hình ảnh" htmlFor={name} />}
       <input
         type="file"
         name={name}
