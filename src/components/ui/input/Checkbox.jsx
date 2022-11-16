@@ -17,6 +17,7 @@ const Checkbox = ({ control, name, display, ...props }) => {
           id={name}
           {...field}
           {...props}
+          defaultChecked={props.value}
         />
         <span className="ml-2 select-none">{display}</span>
       </label>

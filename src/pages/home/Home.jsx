@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BlogItem, BlogList } from "../../components/ui/blog/BlogUi";
 import {
@@ -9,8 +9,10 @@ import {
   ProjectItem,
   ProjectList,
 } from "../../components/ui/project/ProjectUi";
+import { db } from "../../configs/firebase.config";
+import { collection, onSnapshot } from "firebase/firestore";
 
-const ShowItem = ({ color, slug }) => {
+const ShowItem = ({ color, slug, total }) => {
   return (
     <Link
       className={`rounded bg-white shadow-md w-full h-36 relative ${color} cursor-pointer duration-300 hover:shadow-lg`}
@@ -33,7 +35,7 @@ const ShowItem = ({ color, slug }) => {
             : slug === "projects"
             ? "dự án"
             : "blogs"}
-          : 10
+          : {total}
         </span>
       </div>
     </Link>
@@ -41,12 +43,31 @@ const ShowItem = ({ color, slug }) => {
 };
 
 const Home = () => {
+  const [projects, setProjects] = useState([]);
+  const colRef = collection(db, "projects");
+
+  useEffect(() => {
+    onSnapshot(colRef, (res) => {
+      const docs = res.docs;
+      let temp = [];
+
+      docs?.length > 0 &&
+        docs.map((doc) => temp.push({ id: doc.id, ...doc.data() }));
+
+      setProjects(temp);
+    });
+  }, []);
+
   return (
     <div className="py-8">
       <div className="container">
         <div className="grid grid-cols-3 gap-6">
           <ShowItem color="text-blue-500" slug="products" />
-          <ShowItem color="text-orange-500" slug="projects" />
+          <ShowItem
+            color="text-orange-500"
+            slug="projects"
+            total={projects?.length}
+          />
           <ShowItem color="text-pink-400" slug="blogs" />
         </div>
 
@@ -54,7 +75,10 @@ const Home = () => {
         <div className="py-10">
           <h2 className="text-3xl text-slate-900 mb-6 font-bold">Dự án</h2>
           <ProjectList>
-            <ProjectItem />
+            {projects?.length > 0 &&
+              projects.map((project) => (
+                <ProjectItem key={project.id} data={project} />
+              ))}
           </ProjectList>
         </div>
         {/* products */}

@@ -15,6 +15,9 @@
   .btn-primary {
     @apply rounded bg-blue-500 duration-300 hover:bg-blue-400 text-white font-bold capitalize px-4 py-2;
   }
+  input:disabled {
+    @apply opacity-75;
+  }
 }
 
 @layer utilities {

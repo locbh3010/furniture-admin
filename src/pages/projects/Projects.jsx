@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProjectForm from "../../components/ui/form/ProjectForm";
 import {
   ProjectItem,
   ProjectList,
 } from "../../components/ui/project/ProjectUi";
+import { db } from "../../configs/firebase.config";
+import { collection, onSnapshot } from "firebase/firestore";
 
 const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const colRef = collection(db, "projects");
+
+  useEffect(() => {
+    onSnapshot(colRef, (res) => {
+      const docs = res.docs;
+      let temp = [];
+
+      docs?.length > 0 &&
+        docs.map((doc) => temp.push({ id: doc.id, ...doc.data() }));
+
+      setProjects(temp);
+    });
+  }, []);
+
   return (
     <div>
       <div className="container py-12">
@@ -16,7 +33,10 @@ const Projects = () => {
           <ProjectForm />
         </div>
         <ProjectList>
-          <ProjectItem />
+          {projects?.length > 0 &&
+            projects.map((project) => (
+              <ProjectItem key={project.id} data={project} />
+            ))}
         </ProjectList>
       </div>
     </div>

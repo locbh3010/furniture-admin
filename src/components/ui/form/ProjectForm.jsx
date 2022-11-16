@@ -1,20 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { storage } from "../../../configs/firebase.config";
+import { db, storage } from "../../../configs/firebase.config";
 import Checkbox from "../input/Checkbox";
 import Editor from "../input/Editor";
 import Input from "../input/Input";
 import InputFile from "../input/InputFile";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useAddDoc } from "../../../hooks/firesotre-hooks";
+import { useAddDoc, useUpdateDoc } from "../../../hooks/firesotre-hooks";
+import { useParams } from "react-router-dom";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 const ProjectForm = ({ type = "add" }) => {
+  const { id } = type === "update" && useParams();
   const { control, handleSubmit, watch, getValues, setValue } = useForm({
     mode: onchange,
   });
-  const watchSlug = watch("slug");
-  const [image, setImage] = useState(null);
   const [handleAddDoc] = useAddDoc();
+  const [handleUpdateDoc] = useUpdateDoc();
+  const watchSlug = watch("slug");
+
+  const [image, setImage] = useState(null);
+  const [project, setProject] = useState(null);
 
   const handleUploadImage = (file) => {
     if (file) {
@@ -32,13 +38,35 @@ const ProjectForm = ({ type = "add" }) => {
 
     handleUploadImage(file);
   };
-
   const handleAddProject = (value) => {
     handleAddDoc("projects", value);
   };
   const handleUpdateProject = (value) => {
-    console.log("update");
+    handleUpdateDoc(value);
   };
+
+  useEffect(() => {
+    if (id) {
+      const projectRef = doc(collection(db, "projects"), id);
+
+      onSnapshot(projectRef, (res) =>
+        setProject({ id: res.id, ...res.data() })
+      );
+    } else {
+      setProject({
+        showcase: false,
+        feature: false,
+      });
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (project) {
+      for (const key in project) {
+        setValue(key, project[key]);
+      }
+    }
+  }, [project]);
 
   return (
     <div>
@@ -53,6 +81,7 @@ const ProjectForm = ({ type = "add" }) => {
             control={control}
             display="Đường dẫn hình ảnh"
             placeholder="Nơi lưu ảnh"
+            disabled={type === "update" ? true : false}
           ></Input>
           <Input
             name="name"
@@ -73,13 +102,13 @@ const ProjectForm = ({ type = "add" }) => {
               display="Hiển thị ở trang chủ"
               name="feature"
               control={control}
-              value={false}
+              value={project?.feature}
             />
             <Checkbox
               display="Hiển thị ở trang thi công nội thất"
               name="showcase"
               control={control}
-              value={false}
+              value={project?.showcase}
             />
           </div>
           {watchSlug && <InputFile onChange={handleInputChange} />}
@@ -92,11 +121,11 @@ const ProjectForm = ({ type = "add" }) => {
         </div>
       </form>
 
-      <div className="aspect-video rounded-lg overflow-hidden max-w-xl mt-10 mx-auto">
-        {image && (
+      {image && (
+        <div className="aspect-video rounded-lg overflow-hidden max-w-xl mt-10 mx-auto">
           <img src={image} alt="" className="w-full h-full object-cover" />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
