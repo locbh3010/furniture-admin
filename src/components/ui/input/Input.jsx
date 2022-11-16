@@ -2,10 +2,18 @@ import React from "react";
 import { useController } from "react-hook-form";
 import Label from "./Label";
 
-const Input = ({ type = "text", name, control, display, ...props }) => {
+const Input = ({
+  type = "text",
+  name,
+  control,
+  display,
+  defaultValue = "",
+  ...props
+}) => {
   const { field } = useController({
     name,
     control,
+    defaultValue,
   });
   return (
     <div>

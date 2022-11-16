@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Editor from "../input/Editor";
 import Input from "../input/Input";
+import InputFile from "../input/InputFile";
 
 const ProjectForm = ({ type = "add" }) => {
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, watch } = useForm({
     mode: onchange,
   });
+  const watchSlug = watch("slug");
+
   const handleAddProject = (value) => {
     console.log("add");
   };
@@ -35,13 +38,21 @@ const ProjectForm = ({ type = "add" }) => {
             placeholder="Nhập vào tên dự án"
           ></Input>
         </div>
-        <div>
+        <div className="flex flex-col gap-6">
           <Editor
             name="description"
             control={control}
             display="Nhập mô tả cả dự án"
             placeholder="Mô tả"
           />
+
+          {watchSlug && <InputFile />}
+        </div>
+
+        <div className="mt-6 flex-center">
+          <button className="btn-primary px-7 py-3">
+            {type === "add" ? "Thêm" : "Cập nhật"} dự án
+          </button>
         </div>
       </form>
     </div>
