@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import { useAuth } from "./contexts/AuthContext";
 import Home from "./pages/home/Home";
+import Product from "./pages/product/Product";
 import Products from "./pages/products/Products";
 import Project from "./pages/project/Project";
 import Projects from "./pages/projects/Projects";
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/projects" element={<Projects />}></Route>
           <Route path="/project/:id" element={<Project />}></Route>
           <Route path="/products" element={<Products />}></Route>
+          <Route path="/product/:id" element={<Product />}></Route>
           <Route
             path="/sign-in"
             element={<>{user ? <Navigate to="/" /> : <SignIn />}</>}

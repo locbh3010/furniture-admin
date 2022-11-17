@@ -1,9 +1,10 @@
-import { onSnapshot, collection } from "firebase/firestore";
+import { onSnapshot, collection, doc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useParams } from "react-router-dom";
 import { db, storage } from "../../../configs/firebase.config";
-import { useAddDoc } from "../../../hooks/firesotre-hooks";
+import { useAddDoc, useUpdateDoc } from "../../../hooks/firesotre-hooks";
 import Editor from "../input/Editor";
 import Input from "../input/Input";
 import InputFile from "../input/InputFile";
@@ -70,16 +71,19 @@ const ProductForm = ({ type = "add" }) => {
   const { control, setValue, watch, handleSubmit, getValues } = useForm({
     mode: onchange,
   });
+  const { id } = type === "update" && useParams();
 
   // state
   const [projects, setProjects] = useState([]);
   const [images, setImages] = useState({});
+  const [product, setProduct] = useState({});
 
   const watchCateId = watch("cateId");
   const watchSlug = watch("slug");
 
   // hooks custom
   const [handleAddDoc] = useAddDoc();
+  const [handleUpdateDoc] = useUpdateDoc();
 
   useEffect(() => {
     const projectRef = collection(db, "projects");
@@ -102,6 +106,22 @@ const ProductForm = ({ type = "add" }) => {
       });
     }
   }, [watchCateId]);
+  useEffect(() => {
+    if (type === "update" && id) {
+      const productRef = doc(collection(db, "products"), id);
+
+      onSnapshot(productRef, (res) =>
+        setProduct({ id: res.id, ...res.data() })
+      );
+    }
+  }, [id]);
+  useEffect(() => {
+    if (type === "update" && product) {
+      for (const key in product) {
+        setValue(key, product[key]);
+      }
+    }
+  }, [product]);
 
   const handleInputChange = (e) => {
     const files = e.target.files;
@@ -123,11 +143,18 @@ const ProductForm = ({ type = "add" }) => {
       });
     }
   };
-
   const handleAddProduct = (value) => {
     handleAddDoc("products", value);
   };
-  const handleUpdateProduct = (value) => {};
+  const handleUpdateProduct = (value) => {
+    const updateData = {
+      path: "products",
+      id,
+      data: value,
+    };
+
+    handleUpdateDoc(updateData);
+  };
 
   return (
     <div>
@@ -154,6 +181,7 @@ const ProductForm = ({ type = "add" }) => {
                 name={input.name}
                 control={control}
                 display={input.display}
+                disabled={type === "update" && input.name === "slug"}
               />
             ))}
         </div>
@@ -201,4 +229,4 @@ const ProductForm = ({ type = "add" }) => {
   );
 };
 
-export default ProductForm;
+export default React.memo(ProductForm);
