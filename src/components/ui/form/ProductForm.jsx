@@ -1,7 +1,9 @@
 import { onSnapshot, collection } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { db } from "../../../configs/firebase.config";
+import { db, storage } from "../../../configs/firebase.config";
+import { useAddDoc } from "../../../hooks/firesotre-hooks";
 import Editor from "../input/Editor";
 import Input from "../input/Input";
 import InputFile from "../input/InputFile";
@@ -64,18 +66,20 @@ const descriptions = [
   },
 ];
 
-const handleAddProduct = (value) => {
-  console.log(value);
-};
-const handleUpdateProduct = (value) => {};
-
 const ProductForm = ({ type = "add" }) => {
-  const { control, setValue, watch, handleSubmit } = useForm({
+  const { control, setValue, watch, handleSubmit, getValues } = useForm({
     mode: onchange,
   });
+
+  // state
   const [projects, setProjects] = useState([]);
+  const [images, setImages] = useState({});
+
   const watchCateId = watch("cateId");
   const watchSlug = watch("slug");
+
+  // hooks custom
+  const [handleAddDoc] = useAddDoc();
 
   useEffect(() => {
     const projectRef = collection(db, "projects");
@@ -100,8 +104,30 @@ const ProductForm = ({ type = "add" }) => {
   }, [watchCateId]);
 
   const handleInputChange = (e) => {
-    console.log(e.target.dataset.type);
+    const files = e.target.files;
+
+    let tempImages = [];
+    if (files?.length > 0) {
+      [...files].map((file) => {
+        const path = getValues("slug");
+        const storageRef = ref(storage, `images/${path}/${file.name}`);
+        uploadBytes(storageRef, file).then(async (snapshot) => {
+          const downloadURL = await getDownloadURL(snapshot.ref);
+          tempImages.push(downloadURL);
+          setValue(`${e.target.dataset.type}Images`, tempImages);
+          setImages({
+            ...images,
+            [e.target.dataset.type]: tempImages,
+          });
+        });
+      });
+    }
   };
+
+  const handleAddProduct = (value) => {
+    handleAddDoc("products", value);
+  };
+  const handleUpdateProduct = (value) => {};
 
   return (
     <div>
@@ -149,6 +175,16 @@ const ProductForm = ({ type = "add" }) => {
                     data-type={desc.name}
                   />
                 )}
+                <div className="grid grid-cols-3 gap-4 w-full py-4 grid-flow-row auto-rows-fr relative duration-300 origin-top">
+                  {images[desc.name]?.map((img) => (
+                    <div
+                      key={img}
+                      className="w-full h-full aspect-video overflow-hidden"
+                    >
+                      <img src={img} alt="" />
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
         </div>

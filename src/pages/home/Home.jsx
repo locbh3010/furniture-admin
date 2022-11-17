@@ -43,18 +43,23 @@ const ShowItem = ({ color, slug, total }) => {
 };
 
 const Home = () => {
+  const projectRef = collection(db, "projects");
+  const productRef = collection(db, "products");
+  const [products, setProducts] = useState([]);
   const [projects, setProjects] = useState([]);
-  const colRef = collection(db, "projects");
 
   useEffect(() => {
-    onSnapshot(colRef, (res) => {
-      const docs = res.docs;
+    onSnapshot(projectRef, (res) => {
       let temp = [];
-
-      docs?.length > 0 &&
-        docs.map((doc) => temp.push({ id: doc.id, ...doc.data() }));
-
+      res.docs?.length > 0 &&
+        res.docs.map((doc) => temp.push({ id: doc.id, ...doc.data() }));
       setProjects(temp);
+    });
+    onSnapshot(productRef, (res) => {
+      let temp = [];
+      res.docs?.length > 0 &&
+        res.docs.map((doc) => temp.push({ id: doc.id, ...doc.data() }));
+      setProducts(temp);
     });
   }, []);
 
@@ -62,7 +67,11 @@ const Home = () => {
     <div className="py-8">
       <div className="container">
         <div className="grid grid-cols-3 gap-6">
-          <ShowItem color="text-blue-500" slug="products" />
+          <ShowItem
+            color="text-blue-500"
+            slug="products"
+            total={products?.length}
+          />
           <ShowItem
             color="text-orange-500"
             slug="projects"
@@ -70,7 +79,6 @@ const Home = () => {
           />
           <ShowItem color="text-pink-400" slug="blogs" />
         </div>
-
         {/* project */}
         <div className="py-10">
           <h2 className="text-3xl text-slate-900 mb-6 font-bold">Dự án</h2>
@@ -81,11 +89,14 @@ const Home = () => {
               ))}
           </ProjectList>
         </div>
-        {/* products */}
+        {/* products */}{" "}
         <div className="py-10">
           <h2 className="text-3xl text-slate-900 mb-6 font-bold">Sản phẩm</h2>
           <ProductList>
-            <ProductItem />
+            {products?.length > 0 &&
+              products.map((product) => (
+                <ProductItem key={product.id} data={product} />
+              ))}
           </ProductList>
         </div>
         {/* Blogs */}
