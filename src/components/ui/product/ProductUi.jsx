@@ -23,7 +23,10 @@ export const ProductItem = ({ data }) => {
 
   return (
     <div className="w-full h-auto group gap-4">
-      <div className="w-full aspect-video overflow-hidden flex-shrink-0 flex mb-4">
+      <div
+        className="w-full aspect-video overflow-hidden flex-shrink-0 flex mb-4 cursor-pointer"
+        onClick={handleNavigate}
+      >
         {data && (
           <>
             <img
@@ -41,7 +44,12 @@ export const ProductItem = ({ data }) => {
       </div>
       <div className="px-4 flex flex-col gap-10 flex-1">
         <div>
-          <p className="line-clamp-2 text-2xl mb-3 text-ellipsis font-bold"></p>
+          <p
+            className="line-clamp-2 text-2xl mb-3 text-ellipsis font-bold cursor-pointer"
+            onClick={handleNavigate}
+          >
+            {data.name}
+          </p>
           <div className="flex flex-col gap-1">
             <p className="font-normal py-0.5 capitalize text-lg text-ellipsis line-clamp-1">
               <span className="font-bold">Dự án: </span>

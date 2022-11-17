@@ -24,7 +24,7 @@ const ProjectForm = ({ type = "add" }) => {
 
   const handleUploadImage = (file) => {
     if (file) {
-      const path = getValues("path");
+      const path = getValues("slug");
       const storageRef = ref(storage, `images/${path}/${file.name}`);
       uploadBytes(storageRef, file).then(async (snapshot) => {
         const downloadURL = await getDownloadURL(snapshot.ref);

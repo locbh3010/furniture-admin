@@ -32,7 +32,7 @@ const Product = () => {
       onSnapshot(similarQuery, (similarSnapshot) => {
         let temp = [];
         similarSnapshot.docs?.length > 0 &&
-          similarSnapshot.map((similar) =>
+          similarSnapshot.docs.map((similar) =>
             temp.push({ id: similar.id, ...similar.data() })
           );
 
