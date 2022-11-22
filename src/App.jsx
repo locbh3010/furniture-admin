@@ -2,12 +2,8 @@ import React, { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import { useAuth } from "./contexts/AuthContext";
-// import Home from "./pages/home/Home";
-// import Product from "./pages/product/Product";
-// import Products from "./pages/products/Products";
-// import Project from "./pages/project/Project";
-// import Projects from "./pages/projects/Projects";
-// import SignIn from "./pages/signIn/SignIn";
+import Blog from "./pages/blog/Blog";
+import Blogs from "./pages/blog/Blogs";
 
 const Home = lazy(() => import("./pages/home/Home"));
 const Product = lazy(() => import("./pages/product/Product"));
@@ -32,6 +28,8 @@ const App = () => {
               path="/sign-in"
               element={<>{user ? <Navigate to="/" /> : <SignIn />}</>}
             ></Route>
+            <Route path="/blogs" element={<Blogs />}></Route>
+            <Route path="/blog/:id" element={<Blog />}></Route>
           </Route>
         </Routes>
       </Suspense>
