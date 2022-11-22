@@ -2,6 +2,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../../configs/firebase.config";
+import { useDeleteDoc } from "../../../hooks/firesotre-hooks";
 
 export const BlogList = () => {
   const [blogs, setBlogs] = useState([]);
@@ -29,6 +30,7 @@ export const BlogList = () => {
 export const BlogItem = ({ blog }) => {
   const descriptionRef = useRef(null);
   const navigate = useNavigate();
+  const [handleDelete] = useDeleteDoc();
 
   useEffect(() => {
     descriptionRef.current.textContent = "";
@@ -36,6 +38,9 @@ export const BlogItem = ({ blog }) => {
   }, [blog]);
   const handleNavigate = () => {
     navigate(`/blog/${blog.id}`);
+  };
+  const handleDeleteBlog = () => {
+    handleDelete("blogs", blog.id, blog.slug);
   };
   return (
     <div className="rounded-lg shadow-white/25 bg-white flex flex-col shadow-lg">
@@ -62,7 +67,10 @@ export const BlogItem = ({ blog }) => {
           >
             Xem chi tiết
           </button>
-          <button className="rounded-md h-full bg-red-500 text-white font-bold duration-300 hover:bg-red-400">
+          <button
+            className="rounded-md h-full bg-red-500 text-white font-bold duration-300 hover:bg-red-400"
+            onClick={handleDeleteBlog}
+          >
             Xóa
           </button>
         </div>
