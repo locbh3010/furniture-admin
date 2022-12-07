@@ -141,7 +141,12 @@ const BlogForm = ({ type = "add" }) => {
             />
           </>
         )}
-        <div className="my-4">
+        <div className="my-4 flex flex-col gap-6">
+          <Editor
+            control={control}
+            name="description"
+            display="Nhập description blog"
+          />
           <Editor
             control={control}
             name="content"

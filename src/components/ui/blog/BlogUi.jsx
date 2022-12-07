@@ -28,14 +28,9 @@ export const BlogList = () => {
 };
 
 export const BlogItem = ({ blog }) => {
-  const descriptionRef = useRef(null);
   const navigate = useNavigate();
   const [handleDelete] = useDeleteDoc();
 
-  useEffect(() => {
-    descriptionRef.current.textContent = "";
-    descriptionRef.current.insertAdjacentHTML("beforeend", blog.content);
-  }, [blog]);
   const handleNavigate = () => {
     navigate(`/blog/${blog.id}`);
   };
@@ -58,7 +53,7 @@ export const BlogItem = ({ blog }) => {
           >
             {blog.name}
           </p>
-          <p className="line-clamp-4 text-gray-400" ref={descriptionRef}></p>
+          <p className="line-clamp-4 text-gray-400">{blog?.description}</p>
         </div>
         <div className="mt-auto grid grid-cols-2 items-center gap-2">
           <button
